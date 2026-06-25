@@ -5,86 +5,89 @@ struct token_comp {
     type_t ttype;
     const char* out;
 } LUT[] = {{T_INVALID, ""},
-           {RIGHT, "get_global $p \
-                i32.const %u  \
-                i32.add       \
-                set_global $p"},
-           {LEFT, "get_global $p \
-                i32.const %u  \
-                i32.sub       \
-                set_global $p"},
-           {INC, "get_global $p \
-                get_global $p \
-                i32.load8_u   \
-                i32.const %u  \
-                i32.add       \
-                i32.store8    "},
-           {DEC, "get_global $p \
-                get_global $p \
-                i32.load8_u   \
-                i32.const %u  \
-                i32.sub       \
-                i32.store8    "},
-           {OUT, "get_global $p \
-                  i32.load8_u       \
-                  call $put_out"},
-           {IN, "get_global $p  \
-                     call $get_in   \
-                     i32.store8"},
-           {L_START, "(block    \
-                (loop %u     \
-                get_global $p\
-                i32.load8_u  \
-                i32.const 0  \
-                i32.eq       \
-                br_if $%u"},
-           {L_END, "br 0       \
-                  )          \
-                  )"},
+           {RIGHT, "get_global $p "
+                   "i32.const %u "
+                   "i32.add "
+                   "set_global $p "},
+           {LEFT, "get_global $p "
+                  "i32.const %u "
+                  "i32.sub "
+                  "set_global $p "},
+           {INC, "get_global $p "
+                 "get_global $p "
+                 "i32.load8_u "
+                 "i32.const %u "
+                 "i32.add "
+                 "i32.store8 "},
+           {DEC, "get_global $p "
+                 "get_global $p "
+                 "i32.load8_u "
+                 "i32.const %u "
+                 "i32.sub "
+                 "i32.store8 "},
+           {OUT, "get_global $p "
+                 "i32.load8_u "
+                 "call $put_out "},
+           {IN, "get_global $p "
+                "call $get_in "
+                "i32.store8 "},
+           {L_START, "(block $b%u "
+                     "(loop $l%u "
+                     "get_global $p "
+                     "i32.load8_u "
+                     "i32.const 0 "
+                     "i32.eq "
+                     "br_if $b%u "},
+           {L_END, "br $l%u "
+                   ") "
+                   ") "},
            {T_EOF, ""}
 
 };
 
 int write_header(FILE* out) {
 
-    const char* header_top = "(module \
-                              (memory 1) \
-                              %s \
-                              %s \
-                              (global $p (mut i32) (i32.const 0)) \
-                              (func $main";
+    const char* header_top = "(module "
+                             "%s "
+                             "%s "
+                             "(memory 1) "
+                             "%s "
+                             "%s "
+                             "(global $p (mut i32) (i32.const 0)) "
+                             "(func $main ";
 
-    const char* fd_write = "(import \"wasi_snapshot_preview1\" \"fd_write\" \
-                            (func $fd_write (param i32 i32 i32 i32) (result i32))) \
-                            \
-                            (func $put_out (param $out i32) \
-                                (i32.store8 (i32.const 65528) (local.get $out)) \
-                                (i32.store (i32.const 65520) (i32.const 65528)) \
-                                (i32.store (i32.const 65524) (i32.const 1)) \
-                                (call $fd_write \
-                                    (i32.const 1) \
-                                    (i32.const 65520) \
-                                    (i32.const 1) \
-                                    (i32.const 65532)\
-                                )\
-                            drop\
-                            )";
+    const char* fd_write_import = "(import \"wasi_snapshot_preview1\" \"fd_write\" "
+                                  "(func $fd_write (param i32 i32 i32 i32) (result i32))) ";
 
-    const char* fd_read = "(import \"wasi_snapshot_preview1\" \"fd_read\" \
-                            (func $fd_read (param i32 i32 i32 i32) (result i32))) \
-                            (func $get_in (result i32) \
-                                (i32.store (i32.const 65520) (i32.const 65528)) \
-                                (i32.store (i32.const 65524) (i32.const 1)) \
-                                (call $fd_read \
-                                  (i32.const 0) \
-                                  (i32.const 65520) \
-                                  (i32.const 1) \
-                                  (i32.const 65532) \
-                                ) \
-                                drop \
-                            (i32.load8_u (i32.const 65528)) \
-                            )";
-    int written = fprintf(out, header_top, fd_write, fd_read);
+    const char* fd_read_import = "(import \"wasi_snapshot_preview1\" \"fd_read\" "
+                                 "(func $fd_read (param i32 i32 i32 i32) (result i32))) ";
+
+    const char* fd_write = "(func $put_out (param $out i32) "
+                           "(i32.store8 (i32.const 65528) (local.get $out)) "
+                           "(i32.store (i32.const 65520) (i32.const 65528)) "
+                           "(i32.store (i32.const 65524) (i32.const 1)) "
+                           "(call $fd_write "
+                           "    (i32.const 1) "
+                           "    (i32.const 65520) "
+                           "    (i32.const 1) "
+                           "    (i32.const 65532) "
+                           ") "
+                           "drop "
+                           ") ";
+
+    const char* fd_read = "(func $get_in (result i32) "
+                          "(i32.store (i32.const 65520) (i32.const 65528)) "
+                          "(i32.store (i32.const 65524) (i32.const 1)) "
+                          "(call $fd_read "
+                          "(i32.const 0) "
+                          "(i32.const 65520) "
+                          "(i32.const 1) "
+                          "(i32.const 65532) "
+                          ") "
+                          "drop "
+                          "(i32.load8_u (i32.const 65528)) "
+                          ") ";
+    int written = fprintf(out, header_top, fd_write_import, fd_read_import, fd_write, fd_read);
     if (written < 0) {
         return -1;
     }
@@ -92,11 +95,11 @@ int write_header(FILE* out) {
 }
 
 int write_footer(FILE* out) {
-    const char* footer = ") \
-                         (export \"_start\" (func $main)) \
-                         )";
+    const char* footer = ") "
+                         "(export \"_start\" (func $main)) "
+                         ") ";
     int written = fprintf(out, "%s", footer);
-    if(written < 0) {
+    if (written < 0) {
         return -1;
     }
     return 0;
@@ -106,7 +109,8 @@ int write_body(token_stack* stack, FILE* out) {
     // For sequentially identical tokens
     size_t n_tok_seq = 0;
     token_t cur_tok = stack->data[0];
-    for (size_t i = 0; i < stack->top;) {
+    for (size_t i = 0; i < stack->top; i++) {
+        cur_tok = stack->data[i];
         if (cur_tok.type == T_EOF) break;
         // Loop tokens are handled a little weird
         if (cur_tok.type == L_START || cur_tok.type == L_END) {
@@ -114,42 +118,43 @@ int write_body(token_stack* stack, FILE* out) {
         } else {
             n_tok_seq = cur_tok.count;
         }
-        if(cur_tok.type == T_EOF) {
+        if (cur_tok.type == T_EOF) {
             printf("Shouldn't have hit EOF");
             return -1;
         } else if (cur_tok.type == T_INVALID) {
-            i++; 
+            i++;
             cur_tok = stack->data[i];
             continue;
         }
+        
 
-        if(cur_tok.type == L_START) {
-            fprintf(out, LUT[cur_tok.type].out, n_tok_seq, n_tok_seq);
-        } else if(cur_tok.type == L_END) {
-            fprintf(out, "%s", LUT[cur_tok.type].out);
+        if (cur_tok.type == L_START) {
+            size_t label = cur_tok.jump;
+            fprintf(out, LUT[L_START].out, label, label, label);
+        } else if (cur_tok.type == L_END) {
+            size_t label = cur_tok.jump;
+            fprintf(out, LUT[L_END].out, label);
         } else {
             fprintf(out, LUT[cur_tok.type].out, n_tok_seq);
         }
-        i++;
-        cur_tok = stack->data[i];
     }
 
     return 0;
 }
 
 int compile(token_stack* stack, FILE* out) {
-    if(out == NULL) {
+    if (out == NULL) {
         printf("Compile received invalid file descriptor");
         return -1;
     }
     int ret = 0;
     ret = write_header(out);
-    if(ret < 0) {
+    if (ret < 0) {
         printf("Failed to write WAT file header");
         return ret;
     }
     ret = write_body(stack, out);
-    if(ret < 0) {
+    if (ret < 0) {
         printf("Compile failed on program body");
         return ret;
     }
@@ -205,7 +210,7 @@ int main(int argc, char* argv[]) {
     // Compile da file
     fp = fopen(f_out, "w");
     int compile_status = compile(stack, fp);
-    if(compile_status < 0) {
+    if (compile_status < 0) {
         printf("Failed to compile file %s", f_in);
         token_stack_destructor(stack);
         return -1;
