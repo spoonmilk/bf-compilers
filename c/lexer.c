@@ -74,7 +74,7 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
         if (cur_ty == L_START) {
             if (rc > 0) {
                 token_t pending
-                    = {.type = c_to_t[(unsigned char)input[i - 1]], .count = rc, .jump = 0};
+                    = {.type = c_to_t[(unsigned char)input[i - 1]], .jump = 0};
                 if (push_token(tokens, pending) < 0) {
                     free(lstack);
                     return -1;
@@ -82,7 +82,7 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
                 rc = 0;
             }
             size_t start = tokens->top;
-            token_t tok = {.type = L_START, .count = 1, .jump = 0};
+            token_t tok = {.type = L_START, .count = 1,};
             if (push_token(tokens, tok) < 0) {
                 free(lstack);
                 return -1;
@@ -93,7 +93,7 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
 
             if (rc > 0) {
                 token_t pending
-                    = {.type = c_to_t[(unsigned char)input[i - 1]], .count = rc, .jump = 0};
+                    = {.type = c_to_t[(unsigned char)input[i - 1]], .count = rc};
                 if (push_token(tokens, pending) < 0) {
                     free(lstack);
                     return -1;
@@ -106,7 +106,7 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
             }
             size_t start = lstack[--l_top];
             size_t end = tokens->top;
-            token_t tok = {.type = L_END, .count = 1, .jump = start};
+            token_t tok = {.type = L_END, .count = 1};
             if (push_token(tokens, tok) < 0) {
                 free(lstack);
                 return -1;
@@ -117,7 +117,7 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
 
         if (cur_ty != T_EOF && cur_ty != c_to_t[(unsigned char)input[i > 0 ? i - 1 : 0]]) {
             if (rc > 0) {
-                token_t tok = {.type = c_to_t[(unsigned char)input[i - 1]], .count = rc, .jump = 0};
+                token_t tok = {.type = c_to_t[(unsigned char)input[i - 1]], .count = rc};
                 if (push_token(tokens, tok) < 0) {
                     free(lstack);
                     return -1;
@@ -130,7 +130,7 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
     }
     
     if (rc > 0 && cur_ty != T_EOF) {
-        token_t tok = {.type = cur_ty, .count = rc, .jump = 0};
+        token_t tok = {.type = cur_ty, .count = rc};
         if (push_token(tokens, tok) < 0) { free(lstack); return -1; }
     }
 
