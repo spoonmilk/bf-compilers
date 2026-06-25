@@ -74,7 +74,7 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
         if (cur_ty == L_START) {
             if (rc > 0) {
                 token_t pending
-                    = {.type = c_to_t[(unsigned char)input[i - 1]], .jump = 0};
+                    = {.type = c_to_t[(unsigned char)input[i - 1]], .count = rc};
                 if (push_token(tokens, pending) < 0) {
                     free(lstack);
                     return -1;

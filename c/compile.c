@@ -5,14 +5,6 @@ struct token_comp {
     type_t ttype;
     const char* out;
 } LUT[] = {{T_INVALID, ""},
-           {RIGHT, "global.get $p "
-                   "i32.const %u "
-                   "i32.add "
-                   "global.set $p "},
-           {LEFT, "global.get $p "
-                  "i32.const %u "
-                  "i32.sub "
-                  "global.set $p "},
            {INC, "global.get $p "
                  "global.get $p "
                  "i32.load8_u "
@@ -25,6 +17,14 @@ struct token_comp {
                  "i32.const %u "
                  "i32.sub "
                  "i32.store8 "},
+           {RIGHT, "global.get $p "
+                   "i32.const %u "
+                   "i32.add "
+                   "global.set $p "},
+           {LEFT, "global.get $p "
+                  "i32.const %u "
+                  "i32.sub "
+                  "global.set $p "},
            {OUT, "global.get $p "
                  "i32.load8_u "
                  "call $put_out "},
