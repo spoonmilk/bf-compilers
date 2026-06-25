@@ -26,7 +26,7 @@ ifndef OUT
 endif
 	$(eval WAT := $(basename $(OUT)).wat)
 	./$(TARGET) $(BF) $(WAT)
-	wat2wasm $(WAT) -o $(OUT)
+	wat2wasm $(WAT) -o ./out/$(OUT)
 	rm -f $(WAT)
 
 clean:

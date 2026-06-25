@@ -1,2 +1,3 @@
 rust/target
 c/bf_compile
+c/out/*

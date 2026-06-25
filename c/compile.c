@@ -39,8 +39,8 @@ struct token_comp {
                      "i32.eq "
                      "br_if $b%u "},
            {L_END, "br $l%u "
-                   ") "
-                   ") "},
+                       ") "
+                    ") "},
            {T_EOF, ""}
 
 };
@@ -122,8 +122,6 @@ int write_body(token_stack* stack, FILE* out) {
             printf("Shouldn't have hit EOF");
             return -1;
         } else if (cur_tok.type == T_INVALID) {
-            i++;
-            cur_tok = stack->data[i];
             continue;
         }
         

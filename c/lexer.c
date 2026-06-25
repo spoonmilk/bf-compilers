@@ -61,7 +61,7 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
     if (!tokens) return -1;
     // Empty file
     if (len == 0) return 0;
-    type_t cur_ty = c_to_t[input[0]];
+    type_t cur_ty = c_to_t[(unsigned char)input[0]];
     size_t rc = 0;
 
     size_t* lstack = malloc(len * sizeof(size_t));
@@ -106,7 +106,7 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
             }
             size_t start = lstack[--l_top];
             size_t end = tokens->top;
-            token_t tok = {.type = L_END, .count = 1};
+            token_t tok = {.type = L_END, .jump = end};
             if (push_token(tokens, tok) < 0) {
                 free(lstack);
                 return -1;
