@@ -41,8 +41,8 @@ int push_token(token_stack* stack, token_t tok) {
         }
         stack->capacity = new_cap;
     }
-    stack->top++;
     stack->data[stack->top] = tok;
+    stack->top++;
     return 0;
 }
 
@@ -64,9 +64,9 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
     type_t cur_ty = c_to_t[input[0]];
     size_t rc = 0;
 
-    size_t* lstack = malloc(len / 4 * sizeof(size_t));
+    size_t* lstack = malloc(len * sizeof(size_t));
     if (!lstack) return -1;
-    size_t l_top;
+    size_t l_top = 0;
 
     for (size_t i = 0; i < len; i++) {
         cur_ty = c_to_t[(unsigned char)input[i]];
@@ -81,12 +81,13 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
                 }
                 rc = 0;
             }
+            size_t start = tokens->top;
             token_t tok = {.type = L_START, .count = 1, .jump = 0};
             if (push_token(tokens, tok) < 0) {
                 free(lstack);
                 return -1;
             }
-            lstack[l_top++] = tokens->top;
+            lstack[l_top++] = start;
             continue;
         } else if (cur_ty == L_END) {
 
@@ -103,13 +104,14 @@ int lex_bf(token_stack* tokens, char* input, size_t len) {
                 free(lstack);
                 return -1;
             }
-            size_t open = lstack[--l_top];
-            token_t tok = {.type = L_END, .count = 1, .jump = open};
+            size_t start = lstack[--l_top];
+            size_t end = tokens->top;
+            token_t tok = {.type = L_END, .count = 1, .jump = start};
             if (push_token(tokens, tok) < 0) {
                 free(lstack);
                 return -1;
             }
-            tokens->data[open].jump = tokens->top;
+            tokens->data[start].jump = end;
             continue;
         }
 

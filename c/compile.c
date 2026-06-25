@@ -118,8 +118,7 @@ int write_body(token_stack* stack, FILE* out) {
             printf("Shouldn't have hit EOF");
             return -1;
         } else if (cur_tok.type == T_INVALID) {
-            printf("Got invalid token");
-            return -1;
+            continue;
         }
 
         if(cur_tok.type == L_START) {

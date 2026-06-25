@@ -1,5 +1,6 @@
 CC      = gcc
 CFLAGS  = -Wall -Wextra -O2
+DBGCFLAGS  = -Wall -Wextra -O0
 TARGET  = bf_compile
 SRCS    = compile.c lexer.c
 
@@ -9,6 +10,12 @@ build: $(TARGET)
 
 $(TARGET): $(SRCS) lexer.h
 	$(CC) $(CFLAGS) -o $@ $(SRCS)
+
+debug: $(TARGET)
+
+$(TARGET): $(SRCS) lexer.h
+	$(CC) -g $(DBGCFLAGS) -o $@ $(SRCS)
+
 
 compile: $(TARGET)
 ifndef BF
