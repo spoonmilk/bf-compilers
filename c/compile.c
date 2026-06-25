@@ -121,7 +121,14 @@ int write_body(token_stack* stack, FILE* out) {
             printf("Got invalid token");
             return -1;
         }
-        fprintf(out, LUT[cur_tok.type].out, n_tok_seq);
+
+        if(cur_tok.type == L_START) {
+            fprintf(out, LUT[cur_tok.type].out, n_tok_seq, n_tok_seq);
+        } else if(cur_tok.type == L_END) {
+            fprintf(out, "%s", LUT[cur_tok.type].out);
+        } else {
+            fprintf(out, LUT[cur_tok.type].out, n_tok_seq);
+        }
         i++;
         cur_tok = stack->data[i];
     }
