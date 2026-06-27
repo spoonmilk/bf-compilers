@@ -5,12 +5,6 @@
 
 #include "lexer.h"
 
-// An expository note here: I love C. I love C so very much.
-// It is so damn annoying to me that I cannot make allocators
-// with the sort of syntax I would in rust and instead create
-// shit like token_stack_factory. I'd much prefer
-// token_stack::new(), but we can't have everything beautiful.
-
 token_stack* token_stack_factory(size_t initial_capacity) {
     token_t* token_stack_data = malloc(initial_capacity * sizeof(token_t));
     if (!token_stack_data) {
@@ -51,11 +45,6 @@ static const uint8_t c_to_t[256] = {
     ['.'] = OUT, [','] = IN,  ['['] = L_START, [']'] = L_END,
 };
 
-/*
-  Take in an input byte stream and convert it to an array of tokens.
-  Wee!!! I haven't written something like this in a while.
-  Am I forgetting how the hell to write C?
-*/
 int lex_bf(token_stack* tokens, char* input, size_t len) {
     // Invalid token stack
     if (!tokens) return -1;
